@@ -15,6 +15,8 @@ import Board
 import Data.Maybe
 import Control.Monad
 
+--Valid indices
+indices = [(x, y) | x <- [0..3], y <- [0..11]] :: [(Int, Int)]
 --Index helper functions
 
 nextIndex' :: Int -> Maybe Int
@@ -52,32 +54,32 @@ maybeListToMaybeTuple maybeList
     result = catMaybes maybeList
 
 upperLeftIndex :: (Int, Int) -> Maybe (Int, Int)
-upperLeftIndex = getIndex prevIndex' aboveIndex' 
+upperLeftIndex = getIndex aboveIndex' prevIndex' 
 
 aboveIndex :: (Int, Int) -> Maybe (Int, Int)
-aboveIndex = getIndex return aboveIndex'
+aboveIndex = getIndex aboveIndex' return
 
 upperRightIndex :: (Int, Int) -> Maybe (Int, Int)
-upperRightIndex = getIndex nextIndex' aboveIndex'
+upperRightIndex = getIndex aboveIndex' nextIndex'
 
 nextIndex :: (Int, Int) -> Maybe (Int, Int)
-nextIndex = getIndex nextIndex' return
+nextIndex = getIndex return nextIndex'
 
 lowerRightIndex :: (Int, Int) -> Maybe (Int, Int)
-lowerRightIndex = getIndex nextIndex' belowIndex'
+lowerRightIndex = getIndex belowIndex' nextIndex'
 
 belowIndex :: (Int, Int) -> Maybe (Int, Int)
-belowIndex = getIndex return belowIndex'
+belowIndex = getIndex belowIndex' return
 
 lowerLeftIndex :: (Int, Int) -> Maybe (Int, Int)
-lowerLeftIndex = getIndex prevIndex' belowIndex'
+lowerLeftIndex = getIndex belowIndex' prevIndex'
 
 prevIndex :: (Int, Int) -> Maybe (Int, Int)
-prevIndex = getIndex prevIndex' return
+prevIndex = getIndex return prevIndex'
 
 validPos :: (Int, Int) -> Maybe (Int, Int)
 validPos (x, y)
-  |x `elem` [0..11] && y `elem` [0..3] = Just (x,y)
+  |x `elem` [0..3] && y `elem` [0..11] = Just (x,y)
   |otherwise = Nothing
 
 validPosBool :: (Int, Int) -> Bool
@@ -140,15 +142,22 @@ getNeighbors (x, y) board = (map . map) ($ board) ((map . map) ($ (x, y)) neighb
                                               [getBL, getB, getBR]]
                                              
 showNeighbors :: [[Maybe Status]] -> String
-showNeighbors neighbors =  foldl1 (++) (map (++ "\n") (map show (map ( map showMaybeStatus) neighbors)))
+showNeighbors neighbors =  foldl1 (++)
+                           (map (++ "\n")
+                           (map show
+                           (map
+                           (map showMaybeStatus)
+                           neighbors)))
 
 putNeighbors (x, y) board = putStr (showNeighbors (getNeighbors (x, y) board))
 
 --winningBoard :: Board -> Maybe Status
---winningMiddlePos :: Board -> (Int, Int) -> Status -> Bool
---winningMiddlePos board (x, y) status = any  (map all (spaceIsMine) winners)
-  --where winners = map (map spaceIsMine) status
-        
+isWinner :: Board -> Status -> Bool
+isWinner board status = any (== True) (map ($ status ) (map ($ board) (map  winningPos indices)))
+
+winningPos :: (Int, Int) -> Board -> Status -> Bool
+winningPos (x, y) board status = any (==True) (map ($ status) (map allMine (getNeighborfns (x, y) board)))
+
 getNeighborfns (x, y) board = (map . map) ($ board)
                               ((map . map) ($ (x, y))
                                winningNeighborFunctions)
@@ -157,11 +166,14 @@ getNeighborfns (x, y) board = (map . map) ($ board)
                                     [getTL, getC, getBR],
                                     [getTR, getC, getBL]]
 
-spaceIsMine :: Status -> Maybe Status -> Bool
-spaceIsMine status maybeStatus
+spaceIsMine :: Maybe Status -> Status -> Bool
+spaceIsMine maybeStatus status
   |isNothing (maybeStatus) = False
   |fromJust maybeStatus == status = True
   |otherwise = False
+
+allMine :: [Maybe Status] -> Status -> Bool
+allMine maybeStatuses myMark = all (== True) (map ($ myMark) (map (spaceIsMine) maybeStatuses))
 
 
  
