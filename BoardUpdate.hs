@@ -9,7 +9,10 @@ module BoardUpdate (getTL, getT, getTR,
                     getNeighbors,
                    --,putNeighbors
                     validPos,
-                    validPosBool
+                    validPosBool,
+                    isWinner,
+                    showWinner,
+                    winnerExists
                     ) where
 import Board
 import Data.Maybe
@@ -175,6 +178,15 @@ spaceIsMine maybeStatus status
 allMine :: [Maybe Status] -> Status -> Bool
 allMine maybeStatuses myMark = all (== True) (map ($ myMark) (map (spaceIsMine) maybeStatuses))
 
+showWinner :: Board -> String
+showWinner board
+  |isWinner board X && isWinner board O = "Something went wrong. Two winners"
+  |isWinner board X = "X wins!"
+  |isWinner board O = "O wins!"
+  |otherwise = "No winner yet"
 
- 
 
+winnerExists :: Board -> Bool
+winnerExists board
+  |isWinner board X || isWinner board O = True
+  |otherwise = False
