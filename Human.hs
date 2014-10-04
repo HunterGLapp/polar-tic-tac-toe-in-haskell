@@ -1,4 +1,4 @@
-module Human (human) where
+module Human (human, readMaybe) where
 import Board
 import BoardUpdate
 import Data.Maybe

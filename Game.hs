@@ -13,7 +13,7 @@ playGameWith p1 p2 = until gameIsWon playWith (emptyBoard, X, (p1, p2))
 
 fullGameWith p1 p2 = putStrLn (winnerString (playGameWith p1 p2))
 
-winnerString (board, status, (player1, player2)) = (show (nextStatus status)) ++ " is the winner!!!!"
+winnerString (board, status, (player1, player2)) = ("\n" ++ show (nextStatus status)) ++ " is the winner!!!!\nGood Job, " ++ (show player2) ++ "!"
 
 gameIsWon (board, status, (player1, player2)) = winnerExists board
 
