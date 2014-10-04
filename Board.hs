@@ -8,7 +8,8 @@ module Board (Status(X, O, Empty),
               putBoard,
               putMaybeBoard,
               emptyBoard,
-              showMaybeStatus) where
+              showMaybeStatus,
+              nextStatus) where
 import Data.Maybe
 import Control.Monad
 
@@ -19,6 +20,10 @@ instance Show Status where
   show Empty = "_"
 type Row = [Status]
 type Board = [Row]
+
+nextStatus :: Status -> Status
+nextStatus X = O
+nextStatus O = X
 
 --Printing functions
 
