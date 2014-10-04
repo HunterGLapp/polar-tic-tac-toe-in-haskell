@@ -13,6 +13,7 @@ module BoardUpdate (getTL, getT, getTR,
                     isWinner,
                     showWinner,
                     winnerExists,
+                    declareDraw,
                     indices
                     ) where
 import Board
@@ -146,43 +147,37 @@ getNeighbors (x, y) board = (map . map) ($ board) ((map . map) ($ (x, y)) neighb
                                               [getL,  getC, getR ],
                                               [getBL, getB, getBR]]
                                              
-showNeighbors :: [[Maybe Status]] -> String
-showNeighbors neighbors =  foldl1 (++)
+
+putNeighbors (x, y) board = putStr (showNeighbors (getNeighbors (x, y) board)) where
+  showNeighbors neighbors =  foldl1 (++)
                            (map (++ "\n")
                            (map show
                            (map
                            (map showMaybeStatus)
                            neighbors)))
 
-putNeighbors (x, y) board = putStr (showNeighbors (getNeighbors (x, y) board))
-
-
-flatNeighbors (x, y) board = map fromJust (filter (/= Nothing) (concat ( getNeighbors (x, y) board)))
-
-hasNeighbors pos board = any (/= Empty)  (flatNeighbors pos board)
-
+hasNeighbors pos board = any (/= Empty)  (flatNeighbors pos board) where
+  flatNeighbors (x, y) board = map fromJust
+                             (filter (/= Nothing)
+                              (concat
+                               (getNeighbors (x, y) board)))
+                             
 isWinner :: Board -> Status -> Bool
-isWinner board status = any (== True) (map ($ status ) (map ($ board) (map  winningPos indices)))
-
-winningPos :: (Int, Int) -> Board -> Status -> Bool
-winningPos (x, y) board status = any (==True) (map ($ status) (map allMine (getNeighborfns (x, y) board)))
-
-getNeighborfns (x, y) board = (map . map) ($ board)
+isWinner board status = any (== True) (map ($ status ) (map ($ board) (map  winningPos indices))) where
+  winningPos (x, y) board status = any (==True) (map ($ status) (map allMine (getNeighborfns (x, y) board)))
+  getNeighborfns (x, y) board = (map . map) ($ board)
                               ((map . map) ($ (x, y))
-                               winningNeighborFunctions)
-  where winningNeighborFunctions = [[getT, getC, getB],
-                                    [getL, getC, getR],
-                                    [getTL, getC, getBR],
-                                    [getTR, getC, getBL]]
+                               winningNeighborFunctions) where
+   winningNeighborFunctions = [[getT, getC, getB],
+                              [getL, getC, getR],
+                              [getTL, getC, getBR],
+                              [getTR, getC, getBL]]
+  allMine maybeStatuses myMark = all (== True) (map ($ myMark) (map (spaceIsMine) maybeStatuses)) where
+  spaceIsMine maybeStatus status
+    |isNothing (maybeStatus) = False
+    |fromJust maybeStatus == status = True
+    |otherwise = False
 
-spaceIsMine :: Maybe Status -> Status -> Bool
-spaceIsMine maybeStatus status
-  |isNothing (maybeStatus) = False
-  |fromJust maybeStatus == status = True
-  |otherwise = False
-
-allMine :: [Maybe Status] -> Status -> Bool
-allMine maybeStatuses myMark = all (== True) (map ($ myMark) (map (spaceIsMine) maybeStatuses))
 
 showWinner :: Board -> String
 showWinner board
@@ -196,3 +191,11 @@ winnerExists :: Board -> Bool
 winnerExists board
   |isWinner board X || isWinner board O = True
   |otherwise = False
+
+
+declareDraw board = not ((canWin board X) || (canWin board O)) where
+  canWin board status = isWinner (fillEmptyWithStatus board status) status where
+    fillEmptyWithStatus board status = (map . map) (replaceEmptyWith status) board where
+      replaceEmptyWith status space
+        |space == Empty = status
+        |otherwise = space
