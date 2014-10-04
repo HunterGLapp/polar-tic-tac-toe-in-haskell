@@ -6,11 +6,12 @@ import Control.Monad
 import Human
 import AI
 
-data Player = Human | RandomAI deriving Show
+data Player = Human | RandomAI | LazyAI deriving Show
 
 getStrategy :: Player -> (Board, Status) -> (Board, Status)
 getStrategy Human = human
 getStrategy RandomAI = randomAI
+getStrategy LazyAI = lazyAI
 
 
 
