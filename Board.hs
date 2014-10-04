@@ -1,4 +1,4 @@
---Main file for Polar Tic Tac Toe (PTT)
+--Polar Tic Tac Toe
 --Hunter Lapp
 --Artificial Intelligence Fall 2014
 
@@ -9,7 +9,8 @@ module Board (Status(X, O, Empty),
               putMaybeBoard,
               emptyBoard,
               showMaybeStatus,
-              nextStatus) where
+              nextStatus,
+              isEmpty) where
 import Data.Maybe
 import Control.Monad
 
@@ -46,3 +47,5 @@ showMaybeStatus maybeStatus
   |otherwise = show (fromJust maybeStatus) 
   
 emptyBoard = replicate 4 (replicate 12 Empty) :: Board
+
+isEmpty board = all (== Empty) (concat board)

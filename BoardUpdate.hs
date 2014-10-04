@@ -7,12 +7,13 @@ module BoardUpdate (getTL, getT, getTR,
                     setBR, setB, setBL,
                     
                     getNeighbors,
-                   --,putNeighbors
+                    hasNeighbors,
                     validPos,
                     validPosBool,
                     isWinner,
                     showWinner,
-                    winnerExists
+                    winnerExists,
+                    indices
                     ) where
 import Board
 import Data.Maybe
@@ -20,6 +21,7 @@ import Control.Monad
 
 --Valid indices
 indices = [(x, y) | x <- [0..3], y <- [0..11]] :: [(Int, Int)]
+
 --Index helper functions
 
 nextIndex' :: Int -> Maybe Int
@@ -154,7 +156,11 @@ showNeighbors neighbors =  foldl1 (++)
 
 putNeighbors (x, y) board = putStr (showNeighbors (getNeighbors (x, y) board))
 
---winningBoard :: Board -> Maybe Status
+
+flatNeighbors (x, y) board = map fromJust (filter (/= Nothing) (concat ( getNeighbors (x, y) board)))
+
+hasNeighbors pos board = any (/= Empty)  (flatNeighbors pos board)
+
 isWinner :: Board -> Status -> Bool
 isWinner board status = any (== True) (map ($ status ) (map ($ board) (map  winningPos indices)))
 

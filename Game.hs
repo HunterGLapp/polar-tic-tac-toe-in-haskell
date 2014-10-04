@@ -1,5 +1,4 @@
 module Game where
-
 import Board
 import BoardUpdate
 import Player
@@ -19,10 +18,3 @@ winnerString (board, status, (player1, player2)) = (show (nextStatus status)) ++
 gameIsWon (board, status, (player1, player2)) = winnerExists board
 
 humanGame = fullGameWith Human Human
-
-
-
-  
-
-  
-
