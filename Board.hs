@@ -10,6 +10,7 @@ module Board (Status(X, O, Empty),
               emptyBoard,
               showMaybeStatus,
               nextStatus,
+              showBoard,
               isEmpty) where
 import Data.Maybe
 import Control.Monad

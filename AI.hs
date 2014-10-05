@@ -20,7 +20,9 @@ lazyAI' (board, status) = do
 lazyAI = unsafePerformIO . lazyAI'
 
 getAvailableMoves :: Board -> [(Int, Int)]
-getAvailableMoves board = filter (validMove board) indices
+getAvailableMoves board
+  |isEmpty board = indices
+  |otherwise = filter (validMove board) indices
 
 validMove :: Board -> (Int, Int)  -> Bool
 validMove board pos = validPosBool pos && fromJust (getC pos board) == Empty && hasNeighbors pos board
@@ -39,3 +41,17 @@ randomIndex = getStdRandom(randomR (0, 47))
 randomPos = do
             index <- randomIndex
             return (indices !! index)
+
+possibleNewBoards :: Board -> Status -> [Board]
+possibleNewBoards board status = map fromJust
+                                 (map ($ board)
+                                 (map ($ status)
+                                  (map setC moves)))
+                                 where moves = getAvailableMoves board
+                                       
+showPossibilities :: [Board] -> String
+showPossibilities boards =concat (map (++ "\n")
+                                  (map (showBoard) boards))
+
+putPossibilities = putStrLn . showPossibilities
+                    
