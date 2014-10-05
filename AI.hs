@@ -39,5 +39,3 @@ randomIndex = getStdRandom(randomR (0, 47))
 randomPos = do
             index <- randomIndex
             return (indices !! index)
-            
-

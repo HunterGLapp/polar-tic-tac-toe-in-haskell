@@ -1,0 +1,16 @@
+\documentclass[12pt]{article}
+
+\title{Polar Tic Tac Toe}
+
+\author{Hunter Lapp\\
+	Matthew Meerdink\\}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This is where the introduction will go
+
+\end{document}
