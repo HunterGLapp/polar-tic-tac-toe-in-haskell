@@ -33,9 +33,6 @@ randomAI' (board, status) = do
   let newBoard = ((fromJust (setC posCandidate status board)), nextStatus status)
   if (fromJust (getC posCandidate board)  == Empty && (hasNeighbors posCandidate board)) || isEmpty board then putBoard (fst newBoard) >> return newBoard else randomAI' (board, status)
 
---searchWithHeuristic (board, status) = do
-  --putStrLn "\nheuristic AI's turn\n"
-  
 
 randomAI = unsafePerformIO . randomAI'
 
@@ -53,13 +50,12 @@ possibleNewBoards board status = map fromJust
                                  where moves = getAvailableMoves board
 
 possibleNewStates board status = [(b, nextStatus status) | b <- possibleNewBoards board status]
+
 showPossibilities :: [Board] -> String
 showPossibilities boards =concat (map (++ "\n")
                                   (map (showBoard) boards))
 
 putPossibilities = putStrLn . showPossibilities
-                    
---boardAndChildren (board, status) = ((board, status), (possibleNewStates board status))
 
 heuristic :: Board -> Status -> Int
 heuristic board status = (maxNeighbors board status) - (maxNeighbors board (nextStatus status))
@@ -78,6 +74,4 @@ countable status maybeStatus
   |fromJust maybeStatus == status = 1
   |otherwise = 0
 
---data Tree a = Tree a [Tree a]
 
---buildTree (board, status)

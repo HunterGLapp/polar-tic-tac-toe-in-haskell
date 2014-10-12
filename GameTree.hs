@@ -3,13 +3,8 @@ import AI
 import Board
 import BoardUpdate
 import Player
-import Data.Tree
 
+data RoseTree a = Node a [RoseTree a] deriving (Show, Eq, Ord)
 
-buildTree =
-  unfoldTree (heuristicAndChildren)
+ticTacToeTree (board, status) = Node (board, status) (map ticTacToeTree (possibleNewStates board status))
 
-heuristicAndChildren (board, status)
-  |isWinner board status = (10, [])
-  |isWinner board (nextStatus status) = (-10, [])
-  |otherwise = (heuristic board status, possibleNewStates board status)
