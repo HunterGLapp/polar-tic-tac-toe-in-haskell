@@ -60,6 +60,9 @@ putPossibilities = putStrLn . showPossibilities
 heuristic :: Board -> Status -> Int
 heuristic board status = (maxNeighbors board status) - (maxNeighbors board (nextStatus status))
 
+heuristic':: (Board, Status) -> Int
+heuristic' (board, status) = (maxNeighbors board status) - (maxNeighbors board (nextStatus status))
+
 maxNeighbors :: Board -> Status -> Int
 maxNeighbors board status = maximum (map (numNeighbors status) (allNeighbors board))
 
