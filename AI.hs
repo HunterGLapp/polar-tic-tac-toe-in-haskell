@@ -5,6 +5,7 @@ import Data.Maybe(fromJust)
 import System.IO.Unsafe
 import System.Random
 import Control.Monad
+import GameTree
 
 lazyAI' :: (Board, Status) ->IO (Board, Status)
 lazyAI' (board, status) = do
@@ -14,18 +15,12 @@ lazyAI' (board, status) = do
     where
       move
         |isEmpty board = (0,0)
-        |otherwise = head(getAvailableMoves board)
+        |otherwise = head (getAvailableMoves board)
       newBoard = (fromJust (setC move status board), nextStatus status)
 
 lazyAI = unsafePerformIO . lazyAI'
 
-getAvailableMoves :: Board -> [(Int, Int)]
-getAvailableMoves board
-  |isEmpty board = indices
-  |otherwise = filter (validMove board) indices
 
-validMove :: Board -> (Int, Int)  -> Bool
-validMove board pos = validPosBool pos && fromJust (getC pos board) == Empty && hasNeighbors pos board
 
 randomAI' (board, status) = do
   putStrLn "\nRandom AI's turn\n"
@@ -42,39 +37,19 @@ randomPos = do
             index <- randomIndex
             return (indices !! index)
 
-possibleNewBoards :: Board -> Status -> [Board]
-possibleNewBoards board status = map fromJust
-                                 (map ($ board)
-                                 (map ($ status)
-                                  (map setC moves)))
-                                 where moves = getAvailableMoves board
-
-possibleNewStates board status = [(b, nextStatus status) | b <- possibleNewBoards board status]
-
-showPossibilities :: [Board] -> String
-showPossibilities boards =concat (map (++ "\n")
-                                  (map (showBoard) boards))
-
-putPossibilities = putStrLn . showPossibilities
-
-heuristic :: Board -> Status -> Int
-heuristic board status = (maxNeighbors board status) - (maxNeighbors board (nextStatus status))
-
-heuristic':: (Board, Status) -> Int
-heuristic' (board, status) = (maxNeighbors board status) - (maxNeighbors board (nextStatus status))
-
-maxNeighbors :: Board -> Status -> Int
-maxNeighbors board status = maximum (map (numNeighbors status) (allNeighbors board))
-
-allNeighbors board = map ($board) (map getNeighbors indices)
-
-numNeighbors :: Status -> [[Maybe Status]] -> Int
-numNeighbors status maybeNeighbors = sum (map (countable status) (concat maybeNeighbors))
-
-countable :: Status -> Maybe Status -> Int
-countable status maybeStatus
-  |maybeStatus == Nothing = 0
-  |fromJust maybeStatus == status = 1
-  |otherwise = 0
 
 
+
+
+heuristicAI' :: (Board, Status) ->IO (Board, Status)
+heuristicAI' (board, status) = do
+  putStrLn("\nheuristicAI's turn\n")
+  putBoard (fst newBoard)
+  return newBoard
+    where
+      move
+        |isEmpty board = (2, 2)
+        |otherwise = getBestMove (board, status)
+      newBoard = (fromJust (setC move status board), nextStatus status)
+
+heuristicAI = unsafePerformIO . heuristicAI'

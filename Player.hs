@@ -3,17 +3,18 @@ import Board
 import BoardUpdate
 import Data.Maybe
 import Control.Monad
-import Human
+import Human 
 import AI
 
-data Player = Human | RandomAI | LazyAI deriving (Show, Read)
+data Player = Human | RandomAI | LazyAI | HeuristicAI deriving (Show, Read)
 
 getStrategy :: Player -> (Board, Status) -> (Board, Status)
 getStrategy Human = human
 getStrategy RandomAI = randomAI
 getStrategy LazyAI = lazyAI
+getStrategy HeuristicAI = heuristicAI
 
-playerList = [Human, RandomAI, LazyAI]
+playerList = [Human, RandomAI, LazyAI, HeuristicAI]
 gameOptions = [(player1, player2) | player1 <- playerList, player2 <- playerList]
 
 
