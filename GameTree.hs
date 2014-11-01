@@ -1,5 +1,4 @@
 module GameTree where
---import AI
 import Board
 import BoardUpdate
 import Data.Maybe
@@ -22,14 +21,11 @@ trunc :: Int -> RoseTree a -> RoseTree a
 trunc 0 x = Node (getRoot x) []
 trunc n rosetree = Node (getRoot rosetree) (map (trunc (n - 1)) (getChildren rosetree))
 
+labelWithHeuristic :: Status -> (Board, t) -> (Board, t, Int)
 labelWithHeuristic myStatus (board, status) = (board, status, heuristic board myStatus)
 
+labelWithHeuristics :: Functor f => Status -> f (Board, t) -> f (Board, t, Int)
 labelWithHeuristics status rosetree = fmap (labelWithHeuristic status) rosetree
-
-startBoard = fromJust (setC (0, 0) X emptyBoard)
-myTree = trunc 3 (ticTacToeTree (startBoard, O))
-
-treeWithHeuristics = labelWithHeuristics X  myTree
 
 getHeuristic :: (Board, Status, Int) -> Int
 getHeuristic (board, status, heuristic) = heuristic
@@ -43,9 +39,10 @@ getBestMove (board, status) = (getAvailableMoves board) !! (indexOfMax (childVal
     childList = getChildren (labelWithHeuristics status boardTree) where
       boardTree = trunc 2 (ticTacToeTree (board, status))
 
+indexOfMax :: Ord a => [a] -> Int
 indexOfMax list = head (elemIndices (maximum list) list)
 
-
+possibleNewStates :: Board -> Status -> [(Board, Status)]
 possibleNewStates board status = [(b, nextStatus status) | b <- possibleNewBoards board status]
 
 possibleNewBoards :: Board -> Status -> [Board]
@@ -63,7 +60,7 @@ showPossibilities boards =concat (map (++ "\n")
 
 putPossibilities = putStrLn . showPossibilities
 
-
+newMoves :: Board -> Status -> [((Int, Int), Board)]
 newMoves board status =  (zipWith (,) (getAvailableMoves board) (possibleNewBoards board status))
 
 getAvailableMoves :: Board -> [(Int, Int)]
@@ -77,6 +74,7 @@ validMove board pos = validPosBool pos && fromJust (getC pos board) == Empty && 
 maxNeighbors :: Board -> Status -> Int
 maxNeighbors board status = maximum (map (numNeighbors status) (allNeighbors board))
 
+allNeighbors :: Board -> [[[Maybe Status]]]
 allNeighbors board = map ($board) (map getNeighbors indices)
 
 numNeighbors :: Status -> [[Maybe Status]] -> Int
