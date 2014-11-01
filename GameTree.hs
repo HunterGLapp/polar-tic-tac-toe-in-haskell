@@ -9,7 +9,8 @@ data RoseTree a = Node a [RoseTree a] deriving (Show, Eq, Ord)
 instance Functor RoseTree where
   fmap f (Node v children) = (Node (f v) (map (fmap f) children))
 
-ticTacToeTree (board, status) = Node (board, status) (map ticTacToeTree (possibleNewStates board status))
+ticTacToeTree (board, status) = Node (board, status)
+                                (map ticTacToeTree (possibleNewStates board status))
 
 getRoot :: RoseTree a -> a
 getRoot (Node root _) = root
@@ -19,7 +20,8 @@ getChildren (Node _ children) = children
 
 trunc :: Int -> RoseTree a -> RoseTree a
 trunc 0 x = Node (getRoot x) []
-trunc n rosetree = Node (getRoot rosetree) (map (trunc (n - 1)) (getChildren rosetree))
+trunc n rosetree = Node (getRoot rosetree)
+                   (map (trunc (n - 1)) (getChildren rosetree))
 
 labelWithHeuristic :: Status -> (Board, t) -> (Board, t, Int)
 labelWithHeuristic myStatus (board, status) = (board, status, heuristic board myStatus)
@@ -31,7 +33,8 @@ getHeuristic :: (Board, Status, Int) -> Int
 getHeuristic (board, status, heuristic) = heuristic
 
 sumHeuristics :: RoseTree (Board, Status, Int) -> Int
-sumHeuristics rosetree = getHeuristic (getRoot rosetree) + sum (map sumHeuristics (getChildren rosetree))
+sumHeuristics rosetree = getHeuristic (getRoot rosetree) +
+                         sum (map sumHeuristics (getChildren rosetree))
 
 getBestMove :: (Board, Status) -> (Int, Int)
 getBestMove (board, status) = (getAvailableMoves board) !! (indexOfMax (childVals)) where
@@ -61,7 +64,8 @@ showPossibilities boards =concat (map (++ "\n")
 putPossibilities = putStrLn . showPossibilities
 
 newMoves :: Board -> Status -> [((Int, Int), Board)]
-newMoves board status =  (zipWith (,) (getAvailableMoves board) (possibleNewBoards board status))
+newMoves board status =  (zipWith (,) (getAvailableMoves board)
+                          (possibleNewBoards board status))
 
 getAvailableMoves :: Board -> [(Int, Int)]
 getAvailableMoves board
@@ -69,16 +73,21 @@ getAvailableMoves board
   |otherwise = filter (validMove board) indices
 
 validMove :: Board -> (Int, Int)  -> Bool
-validMove board pos = validPosBool pos && fromJust (getC pos board) == Empty && hasNeighbors pos board
+validMove board pos = validPosBool pos &&
+                      fromJust (getC pos board) == Empty &&
+                      hasNeighbors pos board
 
 maxNeighbors :: Board -> Status -> Int
-maxNeighbors board status = maximum (map (numNeighbors status) (allNeighbors board))
+maxNeighbors board status = maximum (map (numNeighbors status)
+                                     (allNeighbors board))
 
 allNeighbors :: Board -> [[[Maybe Status]]]
-allNeighbors board = map ($board) (map getNeighbors indices)
+allNeighbors board = map ($board)
+                     (map getNeighbors indices)
 
 numNeighbors :: Status -> [[Maybe Status]] -> Int
-numNeighbors status maybeNeighbors = sum (map (countable status) (concat maybeNeighbors))
+numNeighbors status maybeNeighbors = sum (map (countable status)
+                                          (concat maybeNeighbors))
 
 countable :: Status -> Maybe Status -> Int
 countable status maybeStatus
