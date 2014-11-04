@@ -22,7 +22,7 @@ getCoords board = do
   input <- getLine
   case readMaybe input of
     Just validInput ->
-        if (validPosBool validInput) && ( fromJust (getC validInput board) == Empty) then (return validInput)
+        if (validPosBool validInput) && ( fromJust (getC validInput board) == Empty) && ((hasNeighbors validInput board) || (isEmpty board)) then (return validInput)
            else (putStrLn "not a valid move" >> getCoords board)
     Nothing -> putStrLn "Invalid coordinates" >> getCoords board
 
