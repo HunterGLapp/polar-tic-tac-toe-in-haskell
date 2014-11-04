@@ -4,6 +4,8 @@ import BoardUpdate
 import Data.Maybe
 import Data.List
 
+testTree = labelWithHeuristics X (trunc 2 (ticTacToeTree (emptyBoard, X)))
+
 data RoseTree a = Node a [RoseTree a] deriving (Show, Eq, Ord)
 
 instance Functor RoseTree where
@@ -23,11 +25,18 @@ trunc 0 x = Node (getRoot x) []
 trunc n rosetree = Node (getRoot rosetree)
                    (map (trunc (n - 1)) (getChildren rosetree))
 
-labelWithHeuristic :: Status -> (Board, t) -> (Board, t, Int)
+labelWithHeuristic :: Status -> (Board, Status) -> (Board, Status, Int)
 labelWithHeuristic myStatus (board, status) = (board, status, heuristic board myStatus)
 
-labelWithHeuristics :: Functor f => Status -> f (Board, t) -> f (Board, t, Int)
-labelWithHeuristics status rosetree = fmap (labelWithHeuristic status) rosetree
+labelWithHeuristics ::  Status -> RoseTree (Board, Status) -> RoseTree (Board, Status, Int)
+labelWithHeuristics status roseTree
+  |isLeaf roseTree = Node ((labelWithHeuristic status) (getRoot roseTree)) []
+  |otherwise  = (Node (labelWithZero (getRoot roseTree))
+                 ((map (labelWithHeuristics status) (getChildren roseTree)))) where
+    labelWithZero (board, status) = (board, status, 0)
+    isLeaf (myTree) = (getChildren (myTree) == [])
+
+
 
 getHeuristic :: (Board, Status, Int) -> Int
 getHeuristic (board, status, heuristic) = heuristic
