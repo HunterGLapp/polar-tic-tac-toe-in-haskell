@@ -1,11 +1,6 @@
-module BoardUpdate (getTL, getT, getTR,
-                    getL,  getC, getR,
-                    getBL, getB, getBR,
-                    
-                    setTL, setT, setTR,
-                    setL,  setC, setR,
-                    setBR, setB, setBL,
-                    
+module BoardUpdate (
+                    getC,
+                    setC,
                     getNeighbors,
                     hasNeighbors,
                     validPos,
@@ -20,6 +15,7 @@ import Data.Maybe
 import Control.Monad
 
 --Valid indices
+
 indices = [(x, y) | x <- [0..3], y <- [0..11]] :: [(Int, Int)]
 
 --Index helper functions
@@ -127,16 +123,8 @@ updateBoardfn f (x,y) status board
   | isNothing (f (x, y)) = Nothing
   | otherwise = Just (updateBoard (fromJust (f (x, y))) status board)
                 
---setter functions
+--setter function
 
-setTL = updateBoardfn upperLeftIndex
-setT = updateBoardfn aboveIndex
-setTR = updateBoardfn upperRightIndex
-setR = updateBoardfn nextIndex
-setBR = updateBoardfn lowerRightIndex
-setB = updateBoardfn belowIndex
-setBL = updateBoardfn lowerLeftIndex
-setL = updateBoardfn prevIndex
 setC = updateBoardfn validPos
 
 --return all neighbor Statuses of a board position
@@ -146,15 +134,6 @@ getNeighbors (x, y) board = (map . map) ($ board) ((map . map) ($ (x, y)) neighb
                                               [getL,  getC, getR ],
                                               [getBL, getB, getBR]]
                                              
-
-putNeighbors (x, y) board = putStr (showNeighbors (getNeighbors (x, y) board)) where
-  showNeighbors neighbors =  foldl1 (++)
-                           (map (++ "\n")
-                           (map show
-                           (map
-                           (map showMaybeStatus)
-                           neighbors)))
-
 hasNeighbors pos board = any (/= Empty)  (flatNeighbors pos board) where
   flatNeighbors (x, y) board = map fromJust
                              (filter (/= Nothing)
@@ -186,7 +165,6 @@ isWinner board status = any (== True)
                                         (a (3, j `addMod12` (-3))))
     where
       m = (map . map) (== status) board
-      newCoords (x, y) = y + 12 * x
       addMod12 a b = (a + b) `mod` 12
       a (i, j) = m !! i !! j
 
@@ -195,13 +173,14 @@ winnerExists board
   |isWinner board X || isWinner board O = True
   |otherwise = False
 
-declareDraw board = not ((canWin board X) || (canWin board O)) where
-  canWin board status = isWinner (fillEmptyWithStatus board status) status
-    where
-      fillEmptyWithStatus board status = (map . map)
-                                         (replaceEmptyWith status)
-                                         board
-        where
-          replaceEmptyWith status space
-            |space == Empty = status
-            |otherwise = space
+declareDraw board = not ((canWin board X) || (canWin board O))
+  where
+    canWin board status = isWinner (fillEmptyWithStatus board status) status
+      where
+        fillEmptyWithStatus board status = (map . map)
+                                           (replaceEmptyWith status)
+                                           board
+          where
+            replaceEmptyWith status space
+              |space == Empty = status
+              |otherwise = space
