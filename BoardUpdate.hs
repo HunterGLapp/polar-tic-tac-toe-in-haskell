@@ -11,7 +11,6 @@ module BoardUpdate (getTL, getT, getTR,
                     validPos,
                     validPosBool,
                     isWinner,
-                    showWinner,
                     winnerExists,
                     declareDraw,
                     indices
@@ -163,39 +162,46 @@ hasNeighbors pos board = any (/= Empty)  (flatNeighbors pos board) where
                                (getNeighbors (x, y) board)))
                              
 isWinner :: Board -> Status -> Bool
-isWinner board status = any (== True) (map ($ status ) (map ($ board) (map  winningPos indices))) where
-  winningPos (x, y) board status = any (==True) (map ($ status) (map allMine (getNeighborfns (x, y) board)))
-  getNeighborfns (x, y) board = (map . map) ($ board)
-                              ((map . map) ($ (x, y))
-                               winningNeighborFunctions) where
-   winningNeighborFunctions = [[getT, getC, getB],
-                              [getL, getC, getR],
-                              [getTL, getC, getBR],
-                              [getTR, getC, getBL]]
-  allMine maybeStatuses myMark = all (== True) (map ($ myMark) (map (spaceIsMine) maybeStatuses)) where
-  spaceIsMine maybeStatus status
-    |isNothing (maybeStatus) = False
-    |fromJust maybeStatus == status = True
-    |otherwise = False
+isWinner board status = any (== True)
+                        (map (isWinningSpace board status)
+                         indices) where
+  isWinningSpace board status (i, j) = ((a (i, j)) &&
+                                        (a (i, j `addMod12` 1)) &&
+                                        (a (i, j `addMod12` 2)) &&
+                                        (a (i, j `addMod12` 3))) ||
 
-
-showWinner :: Board -> String
-showWinner board
-  |isWinner board X && isWinner board O = "Something went wrong. Two winners"
-  |isWinner board X = "X wins!"
-  |isWinner board O = "O wins!"
-  |otherwise = "No winner yet"
-
+                                       ((a (0, j)) &&
+                                        (a (1, j)) &&
+                                        (a (2, j)) &&
+                                        (a (3, j))) ||
+                        
+                                       ((a (0, j)) &&
+                                        (a (1, j `addMod12` 1)) &&
+                                        (a (2, j `addMod12` 2)) &&
+                                        (a (3, j `addMod12` 3))) ||
+                        
+                                       ((a (0, j)) &&
+                                        (a (1, j `addMod12` (-1))) &&
+                                        (a (2, j `addMod12` (-2))) &&
+                                        (a (3, j `addMod12` (-3))))
+    where
+      m = (map . map) (== status) board
+      newCoords (x, y) = y + 12 * x
+      addMod12 a b = (a + b) `mod` 12
+      a (i, j) = m !! i !! j
 
 winnerExists :: Board -> Bool
 winnerExists board
   |isWinner board X || isWinner board O = True
   |otherwise = False
 
-
 declareDraw board = not ((canWin board X) || (canWin board O)) where
-  canWin board status = isWinner (fillEmptyWithStatus board status) status where
-    fillEmptyWithStatus board status = (map . map) (replaceEmptyWith status) board where
-      replaceEmptyWith status space
-        |space == Empty = status
-        |otherwise = space
+  canWin board status = isWinner (fillEmptyWithStatus board status) status
+    where
+      fillEmptyWithStatus board status = (map . map)
+                                         (replaceEmptyWith status)
+                                         board
+        where
+          replaceEmptyWith status space
+            |space == Empty = status
+            |otherwise = space
