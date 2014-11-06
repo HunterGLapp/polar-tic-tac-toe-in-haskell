@@ -4,8 +4,6 @@ import BoardUpdate
 import Data.Maybe
 import Data.List
 
-testTree = labelWithHeuristics X (trunc 2 (ticTacToeTree (emptyBoard, X)))
-
 data RoseTree a = Node a [RoseTree a] deriving (Show, Eq, Ord)
 
 instance Functor RoseTree where
@@ -49,7 +47,7 @@ getBestMove :: (Board, Status) -> (Int, Int)
 getBestMove (board, status) = (getAvailableMoves board) !! (indexOfMax (childVals)) where
   childVals = map sumHeuristics childList where
     childList = getChildren (labelWithHeuristics status boardTree) where
-      boardTree = trunc 2 (ticTacToeTree (board, status))
+      boardTree = trunc 3 (ticTacToeTree (board, status))
 
 indexOfMax :: Ord a => [a] -> Int
 indexOfMax list = head (elemIndices (maximum list) list)
@@ -106,7 +104,7 @@ countable status maybeStatus
 
 heuristic :: Board -> Status -> Int
 heuristic board status
-  |isWinner board status = 50
+  |isWinner board status = 100
   |isWinner board (nextStatus status) = -100
   |otherwise = (maxNeighbors board status) - (maxNeighbors board (nextStatus status))
 
