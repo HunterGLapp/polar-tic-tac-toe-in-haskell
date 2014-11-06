@@ -15,7 +15,7 @@ getStrategy LazyAI = lazyAI
 getStrategy HeuristicAI = heuristicAI
 
 playerList = [Human, RandomAI, LazyAI, HeuristicAI]
-gameOptions = [(player1, player2) | player1 <- playerList, player2 <- playerList]
+gameOptions = [player | player <- playerList]
 
 
 
