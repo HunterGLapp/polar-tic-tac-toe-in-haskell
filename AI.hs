@@ -41,15 +41,17 @@ randomPos = do
 
 
 
-heuristicAI' :: (Board, Status) ->IO (Board, Status)
-heuristicAI' (board, status) = do
+heuristicAI' :: (Board -> Status -> Int) -> (Board, Status) -> IO (Board, Status)
+heuristicAI' heuristic (board, status) = do
   putStrLn("\nheuristicAI's turn\n")
   putBoard (fst newBoard)
   return newBoard
     where
       move
         |isEmpty board = (2, 2)
-        |otherwise = getBestMove (board, status)
+        |otherwise = getBestMove heuristic (board, status)
       newBoard = (fromJust (setC move status board), nextStatus status)
 
-heuristicAI = unsafePerformIO . heuristicAI'
+heuristicAI1 = unsafePerformIO . (heuristicAI' heuristic1)
+
+heuristicAI2 = unsafePerformIO . (heuristicAI' heuristic2)

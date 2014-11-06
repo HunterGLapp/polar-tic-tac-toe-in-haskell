@@ -23,14 +23,14 @@ trunc 0 x = Node (getRoot x) []
 trunc n rosetree = Node (getRoot rosetree)
                    (map (trunc (n - 1)) (getChildren rosetree))
 
-labelWithHeuristic :: Status -> (Board, Status) -> (Board, Status, Int)
-labelWithHeuristic myStatus (board, status) = (board, status, heuristic board myStatus)
+labelWithHeuristic :: (Board -> Status -> Int) ->  Status -> (Board, Status) -> (Board, Status, Int)
+labelWithHeuristic heuristic myStatus (board, status) = (board, status, heuristic board myStatus)
 
-labelWithHeuristics ::  Status -> RoseTree (Board, Status) -> RoseTree (Board, Status, Int)
-labelWithHeuristics status roseTree
-  |isLeaf roseTree = Node ((labelWithHeuristic status) (getRoot roseTree)) []
+labelWithHeuristics :: (Board -> Status -> Int) -> Status -> RoseTree (Board, Status) -> RoseTree (Board, Status, Int)
+labelWithHeuristics heuristic status roseTree
+  |isLeaf roseTree = Node ((labelWithHeuristic heuristic status) (getRoot roseTree)) []
   |otherwise  = (Node (labelWithZero (getRoot roseTree))
-                 ((map (labelWithHeuristics status) (getChildren roseTree)))) where
+                 ((map (labelWithHeuristics heuristic status) (getChildren roseTree)))) where
     labelWithZero (board, status) = (board, status, 0)
     isLeaf (myTree) = (getChildren (myTree) == [])
 
@@ -43,10 +43,10 @@ sumHeuristics :: RoseTree (Board, Status, Int) -> Int
 sumHeuristics rosetree = getHeuristic (getRoot rosetree) +
                          sum (map sumHeuristics (getChildren rosetree))
 
-getBestMove :: (Board, Status) -> (Int, Int)
-getBestMove (board, status) = (getAvailableMoves board) !! (indexOfMax (childVals)) where
+getBestMove ::(Board -> Status -> Int) -> (Board, Status) -> (Int, Int)
+getBestMove heuristic (board, status) = (getAvailableMoves board) !! (indexOfMax (childVals)) where
   childVals = map sumHeuristics childList where
-    childList = getChildren (labelWithHeuristics status boardTree) where
+    childList = getChildren (labelWithHeuristics heuristic status boardTree) where
       boardTree = trunc 3 (ticTacToeTree (board, status))
 
 indexOfMax :: Ord a => [a] -> Int
@@ -102,9 +102,14 @@ countable status maybeStatus
   |fromJust maybeStatus == status = 1
   |otherwise = 0
 
-heuristic :: Board -> Status -> Int
-heuristic board status
+heuristic1 :: Board -> Status -> Int
+heuristic1 board status
   |isWinner board status = 100
   |isWinner board (nextStatus status) = -100
   |otherwise = (maxNeighbors board status) - (maxNeighbors board (nextStatus status))
 
+heuristic2 :: Board -> Status -> Int
+heuristic2 board status
+  |isWinner board status = 100
+  |isWinner board (nextStatus status) = -200
+  |otherwise = 0
