@@ -1,5 +1,8 @@
 module Classifier where
+
 import Board
+import System.Environment
+import Control.Monad
 
 data BoardPrediction = Win | Loss
                      deriving(Show, Eq)
@@ -17,8 +20,8 @@ classes = [Win, Loss]
 prior Win = 0.5
 prior Loss = 0.5
 
-classify :: (Board, Status) -> BoardPrediction
-classify (board, status) = argmax1 p_func classes 
+--classify :: (Board, Status) -> BoardPrediction
+--classify (board, status) = argmax1 p_func classes 
 
 p_func :: BoardPrediction -> (Board, Status) -> Double
 p_func c (board, status) = (prior c) * (product (getProbList c (board, status)))
@@ -26,4 +29,9 @@ p_func c (board, status) = (prior c) * (product (getProbList c (board, status)))
 getProbList :: BoardPrediction -> (Board, Status) -> [Double]
 getProbList Win (board, status) = replicate 48 0.5
 getProblist Loss (board, status) = replicate 48 0.5
+
+buildData = do
+  input <- readFile "TrainingData"
+  let boardArr = read input :: (Board, Status)
+  return boardArr
 
