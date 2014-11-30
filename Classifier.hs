@@ -20,15 +20,17 @@ classes = [Win, Loss]
 prior Win = 0.5
 prior Loss = 0.5
 
---classify :: (Board, Status) -> BoardPrediction
---classify (board, status) = argmax1 p_func classes 
+classify :: (Board, Status) -> BoardPrediction
+classify (board, status) = argmax1 (p_func (board, status)) classes 
 
-p_func :: BoardPrediction -> (Board, Status) -> Double
-p_func c (board, status) = (prior c) * (product (getProbList c (board, status)))
+p_func :: (Board, Status) -> BoardPrediction -> Double
+p_func  (board, status) c = (prior c) * (product (getProbList c (board, status)))
 
 getProbList :: BoardPrediction -> (Board, Status) -> [Double]
 getProbList Win (board, status) = replicate 48 0.5
-getProblist Loss (board, status) = replicate 48 0.5
+getProbList Loss (board, status) = map (1 -) (getProbList Win (board, status))
+
+
 
 buildData = do
   input <- readFile "TrainingData"
