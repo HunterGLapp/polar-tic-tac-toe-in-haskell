@@ -6,6 +6,7 @@ import System.IO.Unsafe
 import System.Random
 import Control.Monad
 import GameTree
+import Minimax
 
 lazyAI' :: (Board, Status) ->IO (Board, Status)
 lazyAI' (board, status) = do
@@ -55,3 +56,29 @@ heuristicAI' heuristic (board, status) = do
 heuristicAI1 = unsafePerformIO . (heuristicAI' heuristic1)
 
 heuristicAI2 = unsafePerformIO . (heuristicAI' heuristic2)
+
+minimaxAI' :: (Board, Status) -> IO (Board, Status)
+minimaxAI' (board, status) = do
+  putStrLn("\nminimaxAI's turn\n")
+  putBoard (fst newBoard)
+  return newBoard
+    where
+      move
+        |isEmpty board = (2, 2)
+        |otherwise = getBestMoveMM (ticTacToeTree (board, status))
+      newBoard = (fromJust (setC move status board), nextStatus status)
+
+minimaxAI = unsafePerformIO . minimaxAI'
+
+minimaxabAI' :: (Board, Status) -> IO (Board, Status)
+minimaxabAI' (board, status) = do
+  putStrLn("\nminimaxabAI's turn\n")
+  putBoard (fst newBoard)
+  return newBoard
+    where
+      move
+        |isEmpty board = (2, 2)
+        |otherwise = getBestMoveMMab (ticTacToeTree (board, status))
+      newBoard = (fromJust (setC move status board), nextStatus status)
+
+minimaxabAI = unsafePerformIO . minimaxabAI'
