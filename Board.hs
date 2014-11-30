@@ -15,11 +15,12 @@ module Board (Status(X, O, Empty),
 import Data.Maybe
 import Control.Monad
 
-data Status  = X | O | Empty  deriving (Eq)
-instance Show Status where
-  show X = "X"
-  show O = "O"
-  show Empty = "_"
+data Status  = X | O | Empty  deriving (Eq, Read, Show)
+
+pprint X = "  X"
+pprint O = "  O"
+pprint Empty = "  _"
+
 type Row = [Status]
 type Board = [Row]
 
@@ -30,7 +31,10 @@ nextStatus O = X
 --Printing functions
 
 showBoard :: Board -> String
-showBoard board = unlines (map show board)
+showBoard board = "  0  1  2  3  4  5  6  7  8  9 10 11\n" ++
+                  "_____________________________________\n" ++
+                  concat (map showRow board) where
+                    showRow row = concat (map pprint row) ++ "\n"
 
 putBoard :: Board -> IO()
 putBoard = putStr . showBoard
