@@ -7,6 +7,7 @@ import System.Random
 import Control.Monad
 import GameTree
 import Minimax
+import Classifier
 
 lazyAI' :: (Board, Status) ->IO (Board, Status)
 lazyAI' (board, status) = do
@@ -78,3 +79,6 @@ minimaxabAI' (board, status) = do
       newBoard = (fromJust (setC move status board), nextStatus status)
 
 minimaxabAI = unsafePerformIO . minimaxabAI'
+
+
+naiveBayesAI = unsafePerformIO . (heuristicAI' classifyHeuristic)

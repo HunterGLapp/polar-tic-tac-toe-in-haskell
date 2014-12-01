@@ -21,7 +21,12 @@ prior Win = 0.5
 prior Loss = 0.5
 
 classify :: (Board, Status) -> BoardPrediction
-classify (board, status) = argmax1 (p_func (board, status)) classes 
+classify (board, status) = argmax1 (p_func (board, status)) classes
+
+classifyHeuristic :: Board -> Status -> Int
+classifyHeuristic board status = evaluate (classify (board, status)) where
+  evaluate Win = 1
+  evaluate Loss = -1
 
 p_func :: (Board, Status) -> BoardPrediction -> Double
 p_func  (board, status) c = (prior c) * (product (getProbList c (board, status)))

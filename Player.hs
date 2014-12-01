@@ -5,8 +5,9 @@ import Data.Maybe
 import Control.Monad
 import Human 
 import AI
+import Classifier
 
-data Player = Human | RandomAI | LazyAI | HeuristicAI1 | HeuristicAI2 | MinimaxAI | MinimaxabAI deriving (Show, Read)
+data Player = Human | RandomAI | LazyAI | HeuristicAI1 | HeuristicAI2 | MinimaxAI | MinimaxabAI | NaiveBayesAI deriving (Show, Read)
 
 getStrategy :: Player -> (Board, Status) -> (Board, Status)
 getStrategy Human = human
@@ -16,8 +17,9 @@ getStrategy HeuristicAI1 = heuristicAI1
 getStrategy HeuristicAI2 = heuristicAI2
 getStrategy MinimaxAI = minimaxAI
 getStrategy MinimaxabAI = minimaxabAI
+getStrategy NaiveBayesAI = naiveBayesAI
 
-playerList = [Human, RandomAI, LazyAI, HeuristicAI1, HeuristicAI2, MinimaxAI, MinimaxabAI]
+playerList = [Human, RandomAI, LazyAI, HeuristicAI1, HeuristicAI2, MinimaxAI, MinimaxabAI, NaiveBayesAI]
 gameOptions = [player | player <- playerList]
 
 
