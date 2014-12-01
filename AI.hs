@@ -38,10 +38,6 @@ randomPos = do
             index <- randomIndex
             return (indices !! index)
 
-
-
-
-
 heuristicAI' :: (Board -> Status -> Int) -> (Board, Status) -> IO (Board, Status)
 heuristicAI' heuristic (board, status) = do
   putStrLn("\nheuristicAI's turn\n")
