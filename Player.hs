@@ -9,6 +9,7 @@ import Classifier
 
 data Player = Human | RandomAI | LazyAI | HeuristicAI1 | HeuristicAI2 | MinimaxAI | MinimaxabAI | NaiveBayesAI deriving (Show, Read)
 
+--Returs a strategy for each player
 getStrategy :: Player -> (Board, Status) -> (Board, Status)
 getStrategy Human = human
 getStrategy RandomAI = randomAI
@@ -19,6 +20,7 @@ getStrategy MinimaxAI = minimaxAI
 getStrategy MinimaxabAI = minimaxabAI
 getStrategy NaiveBayesAI = naiveBayesAI
 
+--List of available player agents
 playerList = [Human, RandomAI, LazyAI, HeuristicAI1, HeuristicAI2, MinimaxAI, MinimaxabAI, NaiveBayesAI]
 gameOptions = [player | player <- playerList]
 

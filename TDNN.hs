@@ -19,11 +19,17 @@ getNeuronOutput inputs weights = activationFn(sum (zipWith (*) inputs weights))
 getLayerOutputs:: [Double] -> Layer -> [Double]
 getLayerOutputs inputs layer = map (getNeuronOutput inputs) layer
 
+--Passes inputs through network and returns outputs
 runThroughNet :: [Double] -> Net -> [Double]
 runThroughNet inputs net = foldl' getLayerOutputs inputs net
 
+--Runs a board through the network and returns output
 runBoard :: Board -> Net -> [Double]
 runBoard board net = runThroughNet (getInputs board) net
+
+--Initialize the network with small random weights
+--takes number of layers and list of neurons per layer
+--as parameters
 
 initializeNetwork :: Int -> [Int] -> IO Net
 initializeNetwork inputs neuronsPerLevel = do
@@ -41,6 +47,7 @@ randomWeights = do
                 let weights = randomRs (0, 0.2) gen
                 return weights
 
+--Converts a board to a list of weights
 getInputs :: Board -> [Double]
 getInputs board = map statusToNum (concat board) where
   statusToNum status
