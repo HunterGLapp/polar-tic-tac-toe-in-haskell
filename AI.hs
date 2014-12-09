@@ -8,6 +8,7 @@ import Control.Monad
 import GameTree
 import Minimax
 import Classifier
+import TDNN
 
 lazyAI' :: (Board, Status) ->IO (Board, Status)
 lazyAI' (board, status) = do
@@ -80,5 +81,20 @@ minimaxabAI' (board, status) = do
 
 minimaxabAI = unsafePerformIO . minimaxabAI'
 
-
 naiveBayesAI = unsafePerformIO . (heuristicAI' 2 classifyHeuristic)
+
+{-
+temporalDistanceAI' :: (Board, Status) -> Double -> Double -> Double -> IO (Board, Status)
+temporalDistanceAI' (board, status) alpha gamma lambda = do
+  putStrLn("\ntemporalDistanceAI's turn\n")
+  net <- readNet
+  eTrace <- readETrace
+  let move = getBestMoveTDNN board status net
+  let newBoard = (fromJust (setC move status board), nextStatus status)
+  let newNet = map (* getNetUpdate net board (fst newBoard) alpha gamma) eTrace
+  let newETrace = getEUpdate eTrace move lambda gamma
+  writeNet newNet
+  writeETrace newETrace
+  putBoard (fst newBoard)
+  return newBoard
+-}
