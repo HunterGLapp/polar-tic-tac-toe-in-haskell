@@ -39,20 +39,20 @@ randomPos = do
             index <- randomIndex
             return (indices !! index)
 
-heuristicAI' :: (Board -> Status -> Int) -> (Board, Status) -> IO (Board, Status)
-heuristicAI' heuristic (board, status) = do
+heuristicAI' :: Int -> (Board -> Status -> Int) -> (Board, Status) -> IO (Board, Status)
+heuristicAI' n heuristic (board, status) = do
   putStrLn("\nheuristicAI's turn\n")
   putBoard (fst newBoard)
   return newBoard
     where
       move
         |isEmpty board = (2, 2)
-        |otherwise = getBestMove heuristic (board, status)
+        |otherwise = getBestMove n heuristic (board, status)
       newBoard = (fromJust (setC move status board), nextStatus status)
 
-heuristicAI1 = unsafePerformIO . (heuristicAI' heuristic1)
+heuristicAI1 = unsafePerformIO . (heuristicAI' 3 heuristic1)
 
-heuristicAI2 = unsafePerformIO . (heuristicAI' heuristic2)
+heuristicAI2 = unsafePerformIO . (heuristicAI' 3 heuristic2)
 
 minimaxAI' :: (Board, Status) -> IO (Board, Status)
 minimaxAI' (board, status) = do
@@ -81,4 +81,4 @@ minimaxabAI' (board, status) = do
 minimaxabAI = unsafePerformIO . minimaxabAI'
 
 
-naiveBayesAI = unsafePerformIO . (heuristicAI' classifyHeuristic)
+naiveBayesAI = unsafePerformIO . (heuristicAI' 2 classifyHeuristic)

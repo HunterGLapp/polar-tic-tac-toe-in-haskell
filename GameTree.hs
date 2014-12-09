@@ -43,11 +43,11 @@ sumHeuristics :: RoseTree (Board, Status, Int) -> Int
 sumHeuristics rosetree = getHeuristic (getRoot rosetree) +
                          sum (map sumHeuristics (getChildren rosetree))
 
-getBestMove ::(Board -> Status -> Int) -> (Board, Status) -> (Int, Int)
-getBestMove heuristic (board, status) = (getAvailableMoves board) !! (indexOfMax (childVals)) where
+getBestMove :: Int -> (Board -> Status -> Int) -> (Board, Status) -> (Int, Int)
+getBestMove n heuristic (board, status) = (getAvailableMoves board) !! (indexOfMax (childVals)) where
   childVals = map sumHeuristics childList where
     childList = getChildren (labelWithHeuristics heuristic status boardTree) where
-      boardTree = trunc 3 (ticTacToeTree (board, status))
+      boardTree = trunc n (ticTacToeTree (board, status))
 
 indexOfMax :: Ord a => [a] -> Int
 indexOfMax list = head (elemIndices (maximum list) list)
