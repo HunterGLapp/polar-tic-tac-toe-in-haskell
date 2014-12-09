@@ -21,4 +21,13 @@ gameIsWon (board, status, (player1, player2)) = winnerExists board
 
 drawGame (board, status, (player1, player2)) = declareDraw board
 
-humanGame = fullGameWith Human Human
+getResult (board, status, (player1, player2)) = (board, status)
+
+trainClassifier :: Int -> [(Board, Status)] -> IO()
+trainClassifier 0 completedTrials = writeFile "TrainingData" (show completedTrials)
+trainClassifier n completedTrials = do
+    let trial = getResult (playGameWith RandomAI RandomAI)
+    let newCompletedTrials = trial : completedTrials
+    trainClassifier (n-1) newCompletedTrials
+    
+
